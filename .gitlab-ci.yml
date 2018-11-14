@@ -1,0 +1,35 @@
+image: alpine
+
+stages:
+    - test
+    - style
+
+unittests:
+    stage: test
+    before_script:
+        - apk update  # apt-get update analog for alpine image
+        - apk add --no-cache python3 py-pip
+        - pip install virtualenv
+        - virtualenv -p python3 prom2016_32
+        - source /builds/smirnov/prom2016_32/prom2016_32/bin/activate
+        - pip install --upgrade pip
+    script:
+        - python /builds/smirnov/prom2016_32/tests.py
+    after_script:
+        - source /builds/smirnov/prom2016_32/prom2016_32/bin/deactivate
+
+pep8:
+    stage: style
+    before_script:
+        - apk update
+        - apk add --no-cache python3 py-pip
+        - pip install virtualenv
+        - virtualenv -p python3 prom2016_32
+        - source /builds/smirnov/prom2016_32/prom2016_32/bin/activate
+        - pip install --upgrade pip
+        - pip install pep8
+    script:
+        - pep8 --ignore=E402 app
+        # ignoring module imports at bottom of files - needed by architecture
+    after_script:
+        - source /builds/smirnov/prom2016_32/prom2016_32/bin/deactivate
